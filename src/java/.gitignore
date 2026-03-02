@@ -1,0 +1,29 @@
+# Fichiers sensibles
+.env
+
+# Fichiers compilés
+*.class
+*.war
+*.ear
+build/
+dist/
+target/
+bin/
+
+# IDE
+.settings/
+.classpath
+.project
+.metadata/
+.nbattrs
+*.iml
+.idea/
+
+# Logs
+*.log
+
+# Base de données (fichiers de données)
+*.db
+*.myd
+*.myi
+*.frm
