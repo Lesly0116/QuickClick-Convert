@@ -1,22 +1,27 @@
 # Utiliser Java 23 pour compiler
 FROM eclipse-temurin:23-jdk
 
-# Installer Ant
-RUN apt-get update && apt-get install -y ant && rm -rf /var/lib/apt/lists/*
+# Installer Ant et wget
+RUN apt-get update && apt-get install -y ant wget && rm -rf /var/lib/apt/lists/*
+
+# Télécharger les bibliothèques Jakarta Servlet
+RUN wget -O /tmp/jakarta.servlet-api.jar \
+    https://repo1.maven.org/maven2/jakarta/servlet/jakarta.servlet-api/6.0.0/jakarta.servlet-api-6.0.0.jar
 
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier tout le code source (y compris les JAR dans web/WEB-INF/lib/)
+# Copier tout le code source
 COPY . .
 
-# Builder le projet avec Ant
+# Builder avec Ant en incluant les JARs Jakarta dans le classpath
 RUN ant -f build.xml \
     -Dj2ee.server.home=/usr/local/tomcat \
     -Dlibs.CopyLibs.classpath=/app/lib/org-netbeans-modules-java-j2seproject-copylibstask.jar \
+    -Djavac.classpath=/tmp/jakarta.servlet-api.jar \
     dist
 
-# Utiliser Tomcat 10 (support jakarta.servlet)
+# Utiliser Tomcat 10 pour exécuter
 FROM tomcat:10-jdk17
 
 # Supprimer les applications par défaut
