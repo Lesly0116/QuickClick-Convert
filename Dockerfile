@@ -1,5 +1,5 @@
-# Utiliser une image avec JDK et Ant (pour builder avec NetBeans)
-FROM openjdk:17-jdk-slim
+# Utiliser une image JDK officielle et fiable
+FROM eclipse-temurin:17-jdk
 
 # Installer Ant (outil de build utilisé par NetBeans)
 RUN apt-get update && apt-get install -y ant && rm -rf /var/lib/apt/lists/*
