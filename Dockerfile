@@ -10,8 +10,8 @@ WORKDIR /app
 # Copier tout le code source dans le conteneur
 COPY . .
 
-# Builder le projet avec Ant (génère le WAR dans dist/)
-RUN ant clean dist
+# Builder le projet avec Ant (utilise build.xml)
+RUN ant -f build.xml dist
 
 # Utiliser Tomcat pour exécuter l'application
 FROM tomcat:9-jdk17
