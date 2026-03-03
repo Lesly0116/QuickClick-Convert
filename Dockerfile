@@ -4,7 +4,7 @@ FROM eclipse-temurin:23-jdk
 # Installer Ant et wget
 RUN apt-get update && apt-get install -y ant wget && rm -rf /var/lib/apt/lists/*
 
-# Télécharger les bibliothèques Jakarta Servlet
+# Télécharger Jakarta Servlet API (déjà fait)
 RUN wget -O /tmp/jakarta.servlet-api.jar \
     https://repo1.maven.org/maven2/jakarta/servlet/jakarta.servlet-api/6.0.0/jakarta.servlet-api-6.0.0.jar
 
@@ -14,11 +14,17 @@ WORKDIR /app
 # Copier tout le code source
 COPY . .
 
-# Builder avec Ant en incluant les JARs Jakarta dans le classpath
+# Créer une variable avec tous les JARs du projet
+RUN echo "Collecting all JARs from web/WEB-INF/lib..." && \
+    JARS=$(find /app/web/WEB-INF/lib -name "*.jar" | tr '\n' ':') && \
+    echo "JARs found: $JARS" && \
+    echo "export CLASSPATH=$JARS:/tmp/jakarta.servlet-api.jar" >> /etc/profile
+
+# Builder avec Ant en incluant tous les JARs
 RUN ant -f build.xml \
     -Dj2ee.server.home=/usr/local/tomcat \
     -Dlibs.CopyLibs.classpath=/app/lib/org-netbeans-modules-java-j2seproject-copylibstask.jar \
-    -Djavac.classpath=/tmp/jakarta.servlet-api.jar \
+    -Djavac.classpath="$(find /app/web/WEB-INF/lib -name '*.jar' | tr '\n' ':'):/tmp/jakarta.servlet-api.jar" \
     dist
 
 # Utiliser Tomcat 10 pour exécuter
