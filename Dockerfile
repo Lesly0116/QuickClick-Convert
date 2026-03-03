@@ -4,8 +4,9 @@ FROM eclipse-temurin:17-jdk
 # Installer Ant et wget
 RUN apt-get update && apt-get install -y ant wget && rm -rf /var/lib/apt/lists/*
 
-# Télécharger les bibliothèques Java EE
-RUN wget -O /tmp/javax.servlet-api.jar https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/4.0.1/javax.servlet-api-4.0.1.jar
+# Télécharger la bibliothèque CopyLibs de NetBeans
+RUN wget -O /tmp/org-netbeans-modules-java-j2seproject-copylibstask.jar \
+    https://repo1.maven.org/maven2/org/netbeans/modules/org-netbeans-modules-java-j2seproject-copylibstask/RELEASE180/org-netbeans-modules-java-j2seproject-copylibstask-RELEASE180.jar
 
 # Définir le répertoire de travail
 WORKDIR /app
@@ -13,11 +14,11 @@ WORKDIR /app
 # Copier tout le code source dans le conteneur
 COPY . .
 
-# Rendre les bibliothèques NetBeans et Java EE disponibles
-ENV CLASSPATH=/app/nbproject/org-netbeans-modules-java-j2seproject-copylibstats.jar:/tmp/javax.servlet-api.jar:$CLASSPATH
-
-# Builder le projet avec Ant
-RUN ant -f build.xml -Dj2ee.server.home=/usr/local/tomcat dist
+# Builder le projet avec Ant en passant tous les paramètres nécessaires
+RUN ant -f build.xml \
+    -Dj2ee.server.home=/usr/local/tomcat \
+    -Dlibs.CopyLibs.classpath=/tmp/org-netbeans-modules-java-j2seproject-copylibstask.jar \
+    dist
 
 # Utiliser Tomcat pour exécuter l'application
 FROM tomcat:9-jdk17
