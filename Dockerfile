@@ -1,12 +1,8 @@
 # Utiliser une image JDK officielle et fiable
 FROM eclipse-temurin:17-jdk
 
-# Installer Ant et wget
-RUN apt-get update && apt-get install -y ant wget && rm -rf /var/lib/apt/lists/*
-
-# Télécharger la bibliothèque CopyLibs de NetBeans (nom CORRIGÉ)
-RUN wget -O /tmp/org-netbeans-modules-java-j2seproject-copylibstask.jar \
-    https://repo1.maven.org/maven2/org/netbeans/modules/org-netbeans-modules-java-j2seproject-copylibstask/RELEASE180/org-netbeans-modules-java-j2seproject-copylibstask-RELEASE180.jar
+# Installer Ant
+RUN apt-get update && apt-get install -y ant && rm -rf /var/lib/apt/lists/*
 
 # Définir le répertoire de travail
 WORKDIR /app
@@ -14,10 +10,10 @@ WORKDIR /app
 # Copier tout le code source dans le conteneur
 COPY . .
 
-# Builder le projet avec Ant
+# Builder le projet avec Ant en utilisant le fichier local
 RUN ant -f build.xml \
     -Dj2ee.server.home=/usr/local/tomcat \
-    -Dlibs.CopyLibs.classpath=/tmp/org-netbeans-modules-java-j2seproject-copylibstask.jar \
+    -Dlibs.CopyLibs.classpath=/app/lib/org-netbeans-modules-java-j2seproject-copylibstask.jar \
     dist
 
 # Utiliser Tomcat pour exécuter l'application
