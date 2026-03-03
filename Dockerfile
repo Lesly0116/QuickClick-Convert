@@ -1,5 +1,5 @@
-# Utiliser une image JDK officielle et fiable
-FROM eclipse-temurin:17-jdk
+# Utiliser Java 23 (compatible avec ton projet)
+FROM eclipse-temurin:23-jdk
 
 # Installer Ant
 RUN apt-get update && apt-get install -y ant && rm -rf /var/lib/apt/lists/*
@@ -10,19 +10,19 @@ WORKDIR /app
 # Copier tout le code source dans le conteneur
 COPY . .
 
-# Builder le projet avec Ant en utilisant le fichier local
+# Builder le projet avec Ant
 RUN ant -f build.xml \
     -Dj2ee.server.home=/usr/local/tomcat \
     -Dlibs.CopyLibs.classpath=/app/lib/org-netbeans-modules-java-j2seproject-copylibstask.jar \
     dist
 
-# Utiliser Tomcat pour exécuter l'application
+# Utiliser Tomcat avec Java 17 (Tomcat 9 fonctionne avec Java 17)
 FROM tomcat:9-jdk17
 
 # Supprimer les applications par défaut
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Copier le WAR généré depuis l'étape précédente
+# Copier le WAR généré
 COPY --from=0 /app/dist/ConvertirFichier.war /usr/local/tomcat/webapps/ROOT.war
 
 # Exposer le port
