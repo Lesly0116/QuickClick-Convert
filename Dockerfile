@@ -10,7 +10,10 @@ WORKDIR /app
 # Copier tout le code source dans le conteneur
 COPY . .
 
-# Builder le projet avec Ant (utilise build.xml)
+# Rendre les bibliothèques NetBeans disponibles pour Ant
+ENV CLASSPATH=/app/nbproject/org-netbeans-modules-java-j2seproject-copylibstats.jar:$CLASSPATH
+
+# Builder le projet avec Ant
 RUN ant -f build.xml -Dj2ee.server.home=/usr/local/tomcat dist
 
 # Utiliser Tomcat pour exécuter l'application
