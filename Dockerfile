@@ -28,7 +28,7 @@ RUN ant -f build.xml \
     dist
 
 # Utiliser Tomcat 10 pour exécuter
-FROM tomcat:10-jdk17
+FROM tomcat:10-jdk23
 
 # Supprimer les applications par défaut
 RUN rm -rf /usr/local/tomcat/webapps/*
