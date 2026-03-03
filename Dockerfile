@@ -1,4 +1,4 @@
-# Utiliser Java 23 (compatible avec ton projet)
+# Utiliser Java 23 pour compiler
 FROM eclipse-temurin:23-jdk
 
 # Installer Ant
@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y ant && rm -rf /var/lib/apt/lists/*
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier tout le code source dans le conteneur
+# Copier tout le code source (y compris les JAR dans web/WEB-INF/lib/)
 COPY . .
 
 # Builder le projet avec Ant
@@ -16,8 +16,8 @@ RUN ant -f build.xml \
     -Dlibs.CopyLibs.classpath=/app/lib/org-netbeans-modules-java-j2seproject-copylibstask.jar \
     dist
 
-# Utiliser Tomcat avec Java 17 (Tomcat 9 fonctionne avec Java 17)
-FROM tomcat:9-jdk17
+# Utiliser Tomcat 10 (support jakarta.servlet)
+FROM tomcat:10-jdk17
 
 # Supprimer les applications par défaut
 RUN rm -rf /usr/local/tomcat/webapps/*
