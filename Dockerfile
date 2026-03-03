@@ -11,7 +11,7 @@ WORKDIR /app
 COPY . .
 
 # Builder le projet avec Ant (utilise build.xml)
-RUN ant -f build.xml dist
+RUN ant -f build.xml -Dj2ee.server.home=/usr/local/tomcat dist
 
 # Utiliser Tomcat pour exécuter l'application
 FROM tomcat:9-jdk17
