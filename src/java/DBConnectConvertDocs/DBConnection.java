@@ -10,44 +10,61 @@ import java.sql.SQLException;
 import io.github.cdimascio.dotenv.Dotenv;
 
 /**
- *
  * @author SOS PC MULTISERVICES
  */
 public class DBConnection {
     
-    private static final Dotenv dotenv = Dotenv.load();
-    
-    private static final String URL = dotenv.get("DB_URL");
-   private static final String Lesly = dotenv.get("DB_USER");
-   private static final String Password = dotenv.get("DB_PASSWORD");
-   private static Connection connection = null;
-   
-   public static Connection getConnection() throws SQLException {
-   
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Erreur de chargement du driver: " + e.getMessage());
-        }
-        
-        return DriverManager.getConnection(URL, Lesly, Password);
-    }
+    private static String URL;
+    private static String USER;
+    private static String PASSWORD;
+    private static Connection connection = null;
 
-   
-    
-    public static void testConnection() {
+    static {
         try {
-            Connection conn = getConnection();
-            if (conn != null && !conn.isClosed()) {
-                System.out.println("Test connexion : RÉUSSIE");
-                System.out.println("Base de données : " + conn.getCatalog());
+            // Charger le driver MySQL
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            
+            // Essayer d'abord les variables d'environnement système (Render)
+            String envUrl = System.getenv("DB_URL");
+            String envUser = System.getenv("DB_USER");
+            String envPassword = System.getenv("DB_PASSWORD");
+            
+            if (envUrl != null && !envUrl.isEmpty()) {
+                // Mode Render : utiliser les variables d'environnement
+                URL = envUrl;
+                USER = envUser;
+                PASSWORD = envPassword;
+                System.out.println("Connexion via variables d'environnement système");
             } else {
-                System.out.println("Test connexion : ÉCHEC");
+                // Mode local : utiliser Dotenv
+                Dotenv dotenv = Dotenv.configure()
+                    .ignoreIfMissing() // Ne pas planter si .env n'existe pas
+                    .load();
+                
+                URL = dotenv.get("DB_URL");
+                USER = dotenv.get("DB_USER");
+                PASSWORD = dotenv.get("DB_PASSWORD");
+                System.out.println("Connexion via fichier .env local");
             }
-        } catch (SQLException e) {
-            System.err.println("Erreur test connexion: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
-    
+
+    public static Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        }
+        return connection;
+    }
+
+    public static void closeConnection() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
