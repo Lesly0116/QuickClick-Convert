@@ -699,7 +699,7 @@
         <h1>📊 Admin Dashboard</h1>
         <div>
             <span><%= adminEmail %> (Admin)</span>
-            <a href="${pageContext.request.contextPath}/DeconnexionServlet" class="logout-btn">Déconnexion</a>
+            <a href="${pageContext.request.contextPath}/LogoutServlet" class="logout-btn">Déconnexion</a>
         </div>
     </header>
 
