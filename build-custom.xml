@@ -19,8 +19,7 @@
     <target name="compile">
         <mkdir dir="${build.classes}"/>
         <javac srcdir="${src.dir}" destdir="${build.classes}" classpathref="classpath"
-               source="21" target="21" includeantruntime="false" fork="true"
-               executable="/usr/lib/jvm/java-21-openjdk-amd64/bin/javac"/>
+               source="21" target="21" includeantruntime="false" fork="true"/>
     </target>
 
     <target name="dist" depends="compile">

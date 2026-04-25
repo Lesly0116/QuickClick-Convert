@@ -12,7 +12,7 @@ WORKDIR /app
 COPY . .
 
 # ========== DIAGNOSTICS ==========
-# 1. Vérifier que javac fonctionne (sans chemin absolu)
+# 1. Vérifier que javac fonctionne
 RUN javac -version
 
 # 2. Compiler un fichier test trivial
@@ -22,31 +22,31 @@ RUN mkdir -p /app/test-compile && \
     java -cp /app/test-compile Test && \
     rm -rf /app/test-compile
 
-# 3. Compiler un seul fichier de votre projet
+# 3. Compiler un seul fichier (hors tests)
 RUN cd /app && \
-    FIRST_JAVA=$(find src -name "*.java" | head -1) && \
+    FIRST_JAVA=$(find src -path "*/test/*" -prune -o -name "*.java" -print | head -1) && \
     if [ -n "$FIRST_JAVA" ]; then \
         echo "Compilation test de : $FIRST_JAVA" && \
         javac -cp "$(find /app/web/WEB-INF/lib -name '*.jar' | tr '\n' ':')/tmp/jakarta.servlet-api.jar" \
             -d /tmp "$FIRST_JAVA"; \
     else \
-        echo "Aucun fichier source trouvé dans src/"; \
+        echo "Aucun fichier source trouvé dans src/ (hors tests)"; \
     fi
 
-# 4. Compiler TOUS les fichiers sources pour voir les erreurs détaillées
+# 4. Compiler TOUS les fichiers (hors tests)
 RUN cd /app && \
     mkdir -p /tmp/build && \
-    find src -name "*.java" > /tmp/sources.txt && \
+    find src -path "*/test/*" -prune -o -name "*.java" -print > /tmp/sources.txt && \
     if [ -s /tmp/sources.txt ]; then \
         echo "Compilation complète de $(wc -l < /tmp/sources.txt) fichiers..." && \
         javac -cp "$(find /app/web/WEB-INF/lib -name '*.jar' | tr '\n' ':')/tmp/jakarta.servlet-api.jar" \
             -d /tmp/build -sourcepath src @/tmp/sources.txt 2>&1 || true; \
     else \
-        echo "Aucune source Java trouvée"; \
+        echo "Aucune source Java trouvée (hors tests)"; \
     fi
 # ========== FIN DIAGNOSTICS ==========
 
-# Builder avec Ant (utilise maintenant build-custom.xml)
+# Builder avec Ant (utilise build-custom.xml)
 RUN ant -f build-custom.xml dist
 
 # Exécution avec Tomcat 10 + JDK 21
