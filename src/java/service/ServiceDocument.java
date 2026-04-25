@@ -28,7 +28,7 @@ public class ServiceDocument {
 
     public ServiceDocument() {
         this.convertApiConfig =
-            Config.defaults("T8u4mn99kmAmccY8z0cFXBxl7JXPr7q3");
+            Config.defaults("n7mE4fKvG5bd9TdVayqqwNL62GQcNZm5");
     }
 
     public File convertPdfToWord(File fichierPdf) throws Exception {
