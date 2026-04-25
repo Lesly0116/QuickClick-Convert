@@ -1,0 +1,36 @@
+<project name="ConvertirFichier" default="dist" basedir=".">
+    <property name="src.dir" value="src"/>
+    <property name="web.dir" value="web"/>
+    <property name="build.dir" value="build"/>
+    <property name="build.classes" value="${build.dir}/WEB-INF/classes"/>
+    <property name="build.lib" value="${build.dir}/WEB-INF/lib"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="dist.war" value="${dist.dir}/ConvertirFichier.war"/>
+
+    <path id="classpath">
+        <fileset dir="${web.dir}/WEB-INF/lib" includes="*.jar"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${build.classes}"/>
+        <javac srcdir="${src.dir}" destdir="${build.classes}" classpathref="classpath"
+               source="21" target="21" includeantruntime="false" fork="true"
+               executable="/usr/lib/jvm/java-21-openjdk-amd64/bin/javac"/>
+    </target>
+
+    <target name="dist" depends="compile">
+        <mkdir dir="${dist.dir}"/>
+        <copy todir="${build.dir}">
+            <fileset dir="${web.dir}"/>
+        </copy>
+        <copy todir="${build.lib}">
+            <fileset dir="${web.dir}/WEB-INF/lib"/>
+        </copy>
+        <jar destfile="${dist.war}" basedir="${build.dir}"/>
+    </target>
+</project>
